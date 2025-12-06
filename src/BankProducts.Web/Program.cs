@@ -32,7 +32,7 @@ builder.Services.AddHostedService<FxRatesBackground>();
 // Ensure DB (seed) + миграции за новите таблици/колони
 if (dbf is SqliteConnFactory s) DbInit.EnsureSqlite(s.ConnString);
 EnsureSchemaUpgrades(dbf);
-// почисти „примерни“ pending-и (без SourceUrl)
+// почисти „примерни“ pending-и 
 CleanSeedPending(dbf);
 
 var app = builder.Build();
@@ -40,7 +40,7 @@ var app = builder.Build();
 app.UseDeveloperExceptionPage();
 app.UseStatusCodePages();
 
-// глобално error handling (за да не връща HTML при JSON)
+// глобално error handling 
 app.Use(async (ctx, next) =>
 {
     try { await next(); }
@@ -56,7 +56,7 @@ app.Use(async (ctx, next) =>
 app.UseStaticFiles();
 app.MapRazorPages();
 
-// ---------------- Admin endpoints (без логин) ----------------
+// ---------------- Admin endpoints  ----------------
 app.MapPost("/admin/run-scrape", async (ScraperService s) =>
 {
     var created = await s.CheckForUpdatesAsync();
@@ -392,17 +392,15 @@ public class ScraperService
         _banks = banks;
     }
 
-    /// <summary>
     /// Главен метод – вика се от /admin/run-scrape и от BgUpdate.
-    /// 1) Скрейпва депозити по банка (както досега).
-    /// 2) Скрейпва ГПР за кредити по ПРОДУКТ (по SourceUrl на LoanProduct).
-    /// </summary>
+    /// 1) Скрейпва депозити по банка.
+    /// 2) Скрейпва ГПР за кредити по SourceUrl на LoanProduct).
     public async Task<int> CheckForUpdatesAsync()
     {
         int created = 0;
         using var http = new HttpClient();
 
-        // 1) Депозити – по банка (старото поведение)
+        // 1) Депозити – по банка
         foreach (var bank in _banks)
         {
             try
@@ -415,18 +413,18 @@ public class ScraperService
             }
             catch
             {
-                // игнор – единичните грешки не спират целия цикъл
+                
             }
         }
 
-        // 2) Кредити – по ПРОДУКТ (по SourceUrl)
+        // 2) Кредити – по SourceUrl
         try
         {
             created += await CheckLoanProductsAprAsync(http);
         }
         catch
         {
-            // по-добре нищо, отколкото да падне целият скрейп
+
         }
 
         return created;
@@ -516,10 +514,8 @@ public class ScraperService
 
     // ---------------- loans: per-product APR по SourceUrl ----------------
 
-    /// <summary>
     /// Обхожда всички LoanProduct със SourceUrl и опитва да намери ГПР на самата продуктова страница.
     /// За всяка разлика над 0.01 в RepresentativeAPRPercent пуска PendingLoanUpdate.
-    /// </summary>
     private async Task<int> CheckLoanProductsAprAsync(HttpClient http)
     {
         int created = 0;
@@ -591,7 +587,7 @@ WHERE SourceUrl IS NOT NULL AND SourceUrl <> ''";
         {
             var html = await http.GetStringAsync(url);
 
-            // 1) първо търсим конкретно „ГПР ... %“ или „APR ... %“
+            // 1) първо търсим конкретно „ГПР %“ или „APR %“
             var mApr = aprRx.Match(html);
             if (mApr.Success)
             {
@@ -604,7 +600,7 @@ WHERE SourceUrl IS NOT NULL AND SourceUrl <> ''";
                 }
             }
 
-            // 2) fallback – първият разумен процент
+            // 2) fallback 
             var m = pct.Match(html);
             if (m.Success)
             {

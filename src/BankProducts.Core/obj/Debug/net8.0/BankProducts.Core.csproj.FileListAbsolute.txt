@@ -9,3 +9,4 @@
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/obj/Debug/net8.0/refint/BankProducts.Core.dll
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/obj/Debug/net8.0/BankProducts.Core.pdb
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/obj/Debug/net8.0/ref/BankProducts.Core.dll
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/obj/Debug/net8.0/BankProducts.Core.sourcelink.json

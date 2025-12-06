@@ -13,3 +13,4 @@
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/refint/BankProducts.Data.dll
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.pdb
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/ref/BankProducts.Data.dll
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.sourcelink.json

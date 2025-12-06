@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-set -e
+cd src/BankProducts.Web
 dotnet restore
-dotnet build -c Debug
-dotnet run --urls=http://localhost:5226
+dotnet run
 

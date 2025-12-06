@@ -378,6 +378,7 @@
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/Debug/net8.0/BankProducts.Web.MvcApplicationPartsAssemblyInfo.cache
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/Debug/net8.0/BankProducts.Web.RazorAssemblyInfo.cache
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/Debug/net8.0/BankProducts.Web.RazorAssemblyInfo.cs
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/Debug/net8.0/BankProducts.Web.sourcelink.json
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/Debug/net8.0/scopedcss/bundle/BankProducts.Web.styles.css
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/Debug/net8.0/staticwebassets.build.json
 /Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/Debug/net8.0/staticwebassets.build.json.cache

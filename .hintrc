@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "border-top: 1px dashed color-mix(in oklab,var(--fg) 15%,transparent)",
+          "border: 1px solid color-mix(in oklab,var(--fg) 12%,transparent)",
+          "border-bottom: 1px solid color-mix(in oklab,var(--fg) 10%,transparent)",
+          "border-top: 1px solid color-mix(in oklab,var(--fg) 10%,transparent)",
+          "border-bottom: 1px solid color-mix(in oklab,var(--fg) 5%,transparent)"
+        ]
+      }
+    ]
+  }
+}
