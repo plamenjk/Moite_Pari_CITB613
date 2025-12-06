@@ -1,0 +1,257 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/BankProducts.Web.csproj": {}
+  },
+  "projects": {
+    "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj",
+        "projectName": "BankProducts.Core",
+        "projectPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj",
+        "packagesPath": "/Users/plamenkostadinov/.nuget/packages/",
+        "outputPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/plamenkostadinov/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/BankProducts.Data.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/BankProducts.Data.csproj",
+        "projectName": "BankProducts.Data",
+        "projectPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/BankProducts.Data.csproj",
+        "packagesPath": "/Users/plamenkostadinov/.nuget/packages/",
+        "outputPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/plamenkostadinov/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj": {
+                "projectPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "MySqlConnector": {
+              "target": "Package",
+              "version": "[2.3.7, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/BankProducts.Web.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/BankProducts.Web.csproj",
+        "projectName": "BankProducts.Web",
+        "projectPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/BankProducts.Web.csproj",
+        "packagesPath": "/Users/plamenkostadinov/.nuget/packages/",
+        "outputPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Web/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/plamenkostadinov/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj": {
+                "projectPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj"
+              },
+              "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/BankProducts.Data.csproj": {
+                "projectPath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/BankProducts.Data.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "MySqlConnector": {
+              "target": "Package",
+              "version": "[2.3.7, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-x64",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

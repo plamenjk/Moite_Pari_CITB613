@@ -1,0 +1,81 @@
+@page
+@inject BankProducts.Data.LoansRepo Loans
+
+@functions {
+  public class LoanItem
+  {
+    public int Id;
+    public string Bank = "";
+    public string Name = "";
+    public int Type; // 1=Потребителски, 2=Ипотечен
+    public string? Url;
+  }
+}
+
+@{
+  ViewData["Title"] = "Каталог кредити";
+
+  // четем филтъра от query
+  int type = 0;
+  int.TryParse(Request.Query["type"], out type);
+
+  // Вземаме от репото (агностично спрямо SQLite/MySQL)
+  var all = await Loans.All();
+  var filtered = (type == 0) ? all : all.Where(x => x.Type == type).ToList();
+
+  var items = filtered.Select(x => new LoanItem {
+    Id = x.Id, Bank = x.Bank, Name = x.Name, Type = x.Type, Url = x.SourceUrl
+  }).ToList();
+}
+
+<h1>Каталог кредити</h1>
+
+<form method="get" class="card" style="display:flex;gap:8px;align-items:center">
+  <label>Тип</label>
+  <select name="type" id="loanType">
+    <option value="0">Всички</option>
+    <option value="1">Потребителски</option>
+    <option value="2">Ипотечни</option>
+  </select>
+  <button class="btn">Филтър</button>
+</form>
+
+@foreach (var it in items)
+{
+  <div class="card selectable">
+    <div class="logo">@it.Bank.Substring(0, Math.Min(3, it.Bank.Length)).ToUpper()</div>
+    <div>
+      <div><b>@it.Bank</b> — @it.Name <span class="badge">@((it.Type==1)?"Потребителски":"Ипотечен")</span></div>
+      <div class="muted">
+        @if (!string.IsNullOrWhiteSpace(it.Url))
+        {
+          <text><a href="@it.Url" target="_blank">източник</a></text>
+        }
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <a class="btn" asp-page="/Loans/Calculator">Калкулатор</a>
+      </div>
+    </div>
+    <div><input type="checkbox" class="pick" value="@it.Id" onchange="togglePickL(this)" /></div>
+  </div>
+}
+
+<div id="compareBarL" class="stickybar">
+  <a class="btn" id="cmpBtnL" href="#">Сравни избраните кредити</a>
+</div>
+
+<script>
+  // задаваме избрания тип без Razor-атрибути
+  document.addEventListener('DOMContentLoaded', function() {
+    var sel = document.getElementById('loanType');
+    if (sel) sel.value = '@type';
+  });
+
+  const selL = new Set();
+  function togglePickL(cb) {
+    if (cb.checked) selL.add(cb.value); else selL.delete(cb.value);
+    document.getElementById('compareBarL').classList.toggle('show', selL.size >= 2);
+    const ids = [...selL];
+    document.getElementById('cmpBtnL').href = '/Loans/Compare?IdsCsv=' + ids.join(',');
+  }
+</script>

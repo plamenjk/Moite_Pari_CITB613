@@ -1,0 +1,20 @@
+@page "{id:int}"
+@inject IDbConnectionFactory DbF
+@{
+  ViewData["Title"]="История на лихви";
+  int id=int.Parse((string)RouteData.Values["id"]!);
+  var rows=new List<(DateTime t, decimal oldR, decimal newR, string src)>();
+  using var con=DbF.Create(); ((dynamic)con).Open();
+  using var cmd=con.CreateCommand(); cmd.CommandText="SELECT ChangedAt,OldRate,NewRate,Source FROM DepositRateHistory WHERE DepositProductId=@id ORDER BY ChangedAt DESC";
+  var p=cmd.CreateParameter(); p.ParameterName="@id"; p.Value=id; cmd.Parameters.Add(p);
+  using var r=((dynamic)cmd).ExecuteReader(); while(r.Read()){ rows.Add((DateTime.Parse(r.GetString(0)), r.GetDecimal(1), r.GetDecimal(2), r.GetString(3))); }
+}
+<h1>История на лихвите</h1>
+@if(rows.Count==0){ <div class="card">Няма данни.</div> } else {
+  <div class="card">
+    <table class="table"><thead><tr><th>Дата</th><th>Стара</th><th>Нова</th><th>Източник</th></tr></thead><tbody>
+    @foreach(var x in rows){ <tr><td>@x.t.ToString("yyyy-MM-dd")</td><td>@x.oldR.ToString("0.##")%</td><td><b>@x.newR.ToString("0.##")%</b></td><td>@x.src</td></tr> }
+    </tbody></table>
+  </div>
+}
+

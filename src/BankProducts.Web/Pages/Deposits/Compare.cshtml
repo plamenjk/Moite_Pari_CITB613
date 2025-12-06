@@ -1,0 +1,22 @@
+@page
+@inject IDbConnectionFactory DbF
+@{
+  ViewData["Title"]="Сравнение депозити";
+  string idsCsv = Request.Query["ids"];
+  var ids = (idsCsv??"").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s=>int.TryParse(s.Trim(), out var x)? x : 0).Where(x=>x>0).ToList();
+  var list = new List<(string bank,string name,string cur,int term,decimal minAmt,decimal rate)>();
+  if(ids.Count>0){
+    using var con=DbF.Create(); ((dynamic)con).Open();
+    using var cmd=con.CreateCommand(); cmd.CommandText=$"SELECT b.Name,dp.Name,dp.Currency,dp.TermMonths,dp.MinAmount,dp.RateAnnualPercent FROM DepositProduct dp JOIN Bank b ON b.Id=dp.BankId WHERE dp.Id IN ({string.Join(',', ids)})";
+    using var r=((dynamic)cmd).ExecuteReader(); while(r.Read()){ list.Add((r.GetString(0),r.GetString(1),r.GetString(2),r.GetInt32(3),r.GetDecimal(4),r.GetDecimal(5))); }
+  }
+}
+<h1>Сравнение</h1>
+@if(list.Count<2){ <div class="card">Избери поне 2 продукта от каталога.</div> } else {
+  <div class="card">
+    <table class="table"><thead><tr><th>Банка</th><th>Продукт</th><th>Валута</th><th>Срок</th><th>Мин</th><th>Лихва</th></tr></thead><tbody>
+    @foreach(var x in list){ <tr><td>@x.bank</td><td>@x.name</td><td>@x.cur</td><td>@x.term</td><td>@x.minAmt.ToString("N0")</td><td>@x.rate.ToString("0.##")%</td></tr> }
+    </tbody></table>
+  </div>
+}
+

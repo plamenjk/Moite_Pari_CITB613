@@ -1,0 +1,176 @@
+@page
+@inject BankProducts.Data.IDbConnectionFactory DbF
+
+@functions{
+  public record DepRow(int Id, int DepId, string Title, string Field, string OldV, string NewV, string? Src);
+  public record LoanRow(int Id, int LoanId, string Title, string Field, string OldV, string NewV, string? Src);
+}
+
+@{
+  ViewData["Title"]="Обновления от реални скрейпъри";
+
+  var depRows = new List<DepRow>();
+  var loanRows = new List<LoanRow>();
+  string? err = null;
+
+  try
+  {
+    using var con = DbF.Create(); ((dynamic)con).Open();
+
+    // --- Pending (Deposits) ---
+    using (var cmd = ((dynamic)con).CreateCommand())
+    {
+      cmd.CommandText = @"
+SELECT p.Id, p.DepositProductId, b.Name, d.Name, p.Field, p.OldValue, p.NewValue, p.SourceUrl
+FROM PendingDepositUpdate p
+JOIN DepositProduct d ON d.Id = p.DepositProductId
+JOIN Bank b ON b.Id = d.BankId
+WHERE p.Status = 0 AND p.SourceUrl IS NOT NULL AND p.SourceUrl <> ''
+ORDER BY p.CreatedAt DESC";
+      using var r = ((dynamic)cmd).ExecuteReader();
+      while (r.Read())
+      {
+        depRows.Add(new DepRow(
+          r.GetInt32(0),
+          r.GetInt32(1),
+          $"{r.GetString(2)} — {r.GetString(3)}",
+          r.GetString(4),
+          r.GetString(5),
+          r.GetString(6),
+          r.IsDBNull(7) ? null : r.GetString(7)
+        ));
+      }
+    }
+
+    // --- Pending (Loans / APR) ---
+    using (var cmd = ((dynamic)con).CreateCommand())
+    {
+      cmd.CommandText = @"
+SELECT p.Id, p.LoanProductId, l.Bank, l.Name, p.Field, p.OldValue, p.NewValue, p.SourceUrl
+FROM PendingLoanUpdate p
+JOIN LoanProduct l ON l.Id = p.LoanProductId
+WHERE p.Status = 0 AND p.SourceUrl IS NOT NULL AND p.SourceUrl <> ''
+ORDER BY p.CreatedAt DESC";
+      using var r = ((dynamic)cmd).ExecuteReader();
+      while (r.Read())
+      {
+        loanRows.Add(new LoanRow(
+          r.GetInt32(0),
+          r.GetInt32(1),
+          $"{r.GetString(2)} — {r.GetString(3)}",
+          r.GetString(4),
+          r.GetString(5),
+          r.GetString(6),
+          r.IsDBNull(7) ? null : r.GetString(7)
+        ));
+      }
+    }
+  }
+  catch (Exception ex)
+  {
+    err = ex.Message;
+  }
+}
+
+<h1>Обновления</h1>
+
+<div class="card">
+  <form method="post" action="/admin/run-scrape"
+        onsubmit="
+          fetch('/admin/run-scrape',{method:'POST'})
+            .then(r => r.ok ? r.json() : r.text().then(t=>{throw new Error(t || ('HTTP '+r.status))}))
+            .then(x => { alert('Нови pending: ' + (x.created ?? 0)); location.reload(); })
+            .catch(e => { alert('Грешка при скрейп: ' + e.message); });
+          return false;">
+    <button class="btn">Провери за промени (всички банки)</button>
+  </form>
+</div>
+
+@if (!string.IsNullOrEmpty(err))
+{
+  <div class="card error">
+    <b>Грешка при зареждане</b><br/>
+    <div style="white-space:pre-wrap">@err</div>
+  </div>
+}
+else
+{
+  <h2 style="margin-top:16px">Депозити</h2>
+  @if (depRows.Count == 0) {
+    <div class="card"><p>Няма чакащи промени за депозити.</p></div>
+  } else {
+    <table class="table card">
+      <thead><tr><th>ID</th><th>Продукт</th><th>Поле</th><th>Старо</th><th>Ново</th><th>Източник</th><th>Действия</th></tr></thead>
+      <tbody>
+      @foreach (var x in depRows)
+      {
+        <tr>
+          <td>@x.Id</td>
+          <td>@x.Title</td>
+          <td>@x.Field</td>
+          <td>@x.OldV</td>
+          <td><b>@x.NewV</b></td>
+          <td>@(string.IsNullOrWhiteSpace(x.Src) ? "" : $"<a href=\"{x.Src}\" target=\"_blank\">линк</a>")</td>
+          <td>
+            <button class="btn" onclick="approveDep(@x.Id)">Одобри</button>
+            <button class="btn secondary" onclick="rejectDep(@x.Id)">Откажи</button>
+          </td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  }
+
+  <h2 style="margin-top:16px">Кредити (APR)</h2>
+  @if (loanRows.Count == 0) {
+    <div class="card"><p>Няма чакащи промени за кредити.</p></div>
+  } else {
+    <table class="table card">
+      <thead><tr><th>ID</th><th>Продукт</th><th>Поле</th><th>Старо</th><th>Ново</th><th>Източник</th><th>Действия</th></tr></thead>
+      <tbody>
+      @foreach (var x in loanRows)
+      {
+        <tr>
+          <td>@x.Id</td>
+          <td>@x.Title</td>
+          <td>@x.Field</td>
+          <td>@x.OldV</td>
+          <td><b>@x.NewV</b></td>
+          <td>@(string.IsNullOrWhiteSpace(x.Src) ? "" : $"<a href=\"{x.Src}\" target=\"_blank\">линк</a>")</td>
+          <td>
+            <button class="btn" onclick="approveLoan(@x.Id)">Одобри</button>
+            <button class="btn secondary" onclick="rejectLoan(@x.Id)">Откажи</button>
+          </td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  }
+
+  <script>
+    function approveDep(id){
+      fetch('/admin/updates/'+id+'/approve',{method:'POST'})
+        .then(r => r.ok ? r.json() : r.text().then(t=>{throw new Error(t || ('HTTP '+r.status))}))
+        .then(_=>location.reload())
+        .catch(e=>alert('Грешка при одобрение (депозит): '+e.message));
+    }
+    function rejectDep(id){
+      fetch('/admin/updates/'+id+'/reject',{method:'POST'})
+        .then(r => r.ok ? r.json() : r.text().then(t=>{throw new Error(t || ('HTTP '+r.status))}))
+        .then(_=>location.reload())
+        .catch(e=>alert('Грешка при отказ (депозит): '+e.message));
+    }
+    function approveLoan(id){
+      fetch('/admin/loan-updates/'+id+'/approve',{method:'POST'})
+        .then(r => r.ok ? r.json() : r.text().then(t=>{throw new Error(t || ('HTTP '+r.status))}))
+        .then(_=>location.reload())
+        .catch(e=>alert('Грешка при одобрение (кредит): '+e.message));
+    }
+    function rejectLoan(id){
+      fetch('/admin/loan-updates/'+id+'/reject',{method:'POST'})
+        .then(r => r.ok ? r.json() : r.text().then(t=>{throw new Error(t || ('HTTP '+r.status))}))
+        .then(_=>location.reload())
+        .catch(e=>alert('Грешка при отказ (кредит): '+e.message));
+    }
+  </script>
+}

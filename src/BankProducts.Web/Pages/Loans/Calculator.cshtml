@@ -1,0 +1,50 @@
+@page
+@inject BankProducts.Data.LoansRepo Loans
+@{
+  ViewData["Title"]="Кредит калкулатор";
+  var all = await Loans.All();
+  var consumer = all.Where(x => x.Type == 1).ToList();
+  var mortgage = all.Where(x => x.Type == 2).ToList();
+  var ids = string.Join(",", consumer.Take(2).Concat(mortgage.Take(1)).Select(x=>x.Id));
+}
+<div class="card">
+  <h3>Параметри</h3>
+  <form method="get" action="/Loans/Compare" class="grid">
+    <label>Продукти IDs
+      <input name="IdsCsv" value="@ids" />
+    </label>
+    <label>Главница
+      <input type="number" step="0.01" name="Principal" value="20000" />
+    </label>
+    <label>Срок (месеци)
+      <input type="number" name="TermMonths" value="120" />
+    </label>
+    <label>Годишна лихва %
+      <input type="number" step="0.01" name="AnnualRatePercent" value="6" />
+    </label>
+    <label>Такса еднократно
+      <input type="number" step="0.01" name="FeesUpfront" value="0" />
+    </label>
+    <label>Месечна такса
+      <input type="number" step="0.01" name="MonthlyFee" value="0" />
+    </label>
+    <button class="btn">Сравни</button>
+  </form>
+</div>
+<div class="card">
+  <h3>Каталози</h3>
+  <div class="grid">
+    <div>
+      <h4>Потребителски</h4>
+      <ul>
+        @foreach (var x in consumer){ <li>@x.Bank — @x.Name <span class="badge">ID @x.Id</span></li> }
+      </ul>
+    </div>
+    <div>
+      <h4>Ипотечни</h4>
+      <ul>
+        @foreach (var x in mortgage){ <li>@x.Bank — @x.Name <span class="badge">ID @x.Id</span></li> }
+      </ul>
+    </div>
+  </div>
+</div>

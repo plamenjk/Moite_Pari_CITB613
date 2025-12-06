@@ -1,0 +1,15 @@
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/bin/Debug/net8.0/BankProducts.Data.deps.json
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/bin/Debug/net8.0/BankProducts.Data.dll
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/bin/Debug/net8.0/BankProducts.Data.pdb
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/bin/Debug/net8.0/BankProducts.Core.dll
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/bin/Debug/net8.0/BankProducts.Core.pdb
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.csproj.AssemblyReference.cache
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.GeneratedMSBuildEditorConfig.editorconfig
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.AssemblyInfoInputs.cache
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.AssemblyInfo.cs
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.csproj.CoreCompileInputs.cache
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProd.6BB9089F.Up2Date
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.dll
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/refint/BankProducts.Data.dll
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/BankProducts.Data.pdb
+/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Data/obj/Debug/net8.0/ref/BankProducts.Data.dll

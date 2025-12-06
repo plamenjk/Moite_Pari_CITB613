@@ -1,0 +1,127 @@
+@page
+@inject BankProducts.Data.LoansRepo Repo
+@inject BankProducts.Core.LoanCalcService Calc
+
+@functions{
+  public class Row
+  {
+    public string Bank = "";
+    public string Name = "";
+    public int Type;
+    public decimal Pmt;
+    public decimal APR;
+    public decimal Paid;
+    public decimal Int;
+  }
+}
+
+@{
+  ViewData["Title"] = "Сравнение кредити";
+
+  string idsCsv = Request.Query["IdsCsv"].ToString();
+
+  decimal.TryParse(Request.Query["Principal"], out var principal);
+  if (principal <= 0) principal = 20000;
+
+  int.TryParse(Request.Query["TermMonths"], out var term);
+  if (term <= 0) term = 120;
+
+  decimal.TryParse(Request.Query["AnnualRatePercent"], out var rate);
+  if (rate <= 0) rate = 6;
+
+  decimal.TryParse(Request.Query["FeesUpfront"], out var feeUp);
+  decimal.TryParse(Request.Query["MonthlyFee"], out var feeM);
+
+  var ids = (idsCsv ?? "")
+      .Split(',', StringSplitOptions.RemoveEmptyEntries)
+      .Select(s => int.TryParse(s.Trim(), out var x) ? x : 0)
+      .Where(x => x > 0)
+      .ToList();
+
+  var rows = new List<Row>();
+
+  if (ids.Count > 0)
+  {
+    var prods = await Repo.ByIds(ids);
+
+    foreach (var p in prods)
+    {
+      // ползваме RepresentativeAPRPercent от продукта, ако е зададен; иначе падаме обратно към стойността от формата
+      var effRate = p.RepresentativeAPRPercent ?? rate;
+
+      var r = Calc.Calc(p, new LoanInput
+      {
+        ProductId = p.Id,
+        Principal = principal,
+        TermMonths = term,
+        AnnualRatePercent = effRate,
+        FeesUpfront = feeUp,
+        MonthlyFee = feeM
+      });
+
+      rows.Add(new Row
+      {
+        Bank = p.Bank,
+        Name = p.Name,
+        Type = p.Type,
+        Pmt = r.MonthlyPayment,
+        APR = r.APRPercent,
+        Paid = r.TotalPaid,
+        Int = r.TotalInterest
+      });
+    }
+  }
+
+  var idsEsc = Uri.EscapeDataString(idsCsv ?? "");
+}
+
+<h1>Сравнение</h1>
+
+@if (rows.Count < 1)
+{
+  <div class="card">Попълнете параметри в калкулатора и изберете продукти.</div>
+}
+else
+{
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Банка</th>
+          <th>Продукт</th>
+          <th>Тип</th>
+          <th>Месечна вноска</th>
+          <th>ГПР %</th>
+          <th>Общо платено</th>
+          <th>Лихва общо</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var x in rows)
+        {
+          <tr>
+            <td>@x.Bank</td>
+            <td>@x.Name</td>
+            <td>@((x.Type == 1) ? "Потреб." : "Ипот.")</td>
+            <td>@x.Pmt</td>
+            <td>@x.APR</td>
+            <td>@x.Paid</td>
+            <td>@x.Int</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <a class="btn"
+       href="@($"/api/loans/compare.csv?idsCsv={idsEsc}&principal={principal}&term={term}&rate={rate}&feeUp={feeUp}&feeM={feeM}")">
+      Export CSV
+    </a>
+    <a class="btn secondary"
+       href="@($"/api/loans/compare.json?idsCsv={idsEsc}&principal={principal}&term={term}&rate={rate}&feeUp={feeUp}&feeM={feeM}")"
+       target="_blank">
+      Export JSON
+    </a>
+  </div>
+}

@@ -1,0 +1,21 @@
+@page "{id:int}"
+@inject IDbConnectionFactory DbF
+@{
+  ViewData["Title"]="Детайли депозит";
+  int id = int.Parse((string)RouteData.Values["id"]!);
+  using var con=DbF.Create(); ((dynamic)con).Open();
+  using var cmd=con.CreateCommand(); cmd.CommandText=@"SELECT b.Name,dp.Name,dp.Currency,dp.TermMonths,dp.MinAmount,dp.RateAnnualPercent,dp.SourceUrl 
+FROM DepositProduct dp JOIN Bank b ON b.Id=dp.BankId WHERE dp.Id=@id";
+  var p=cmd.CreateParameter(); p.ParameterName="@id"; p.Value=id; cmd.Parameters.Add(p);
+  string bank="", name="", cur=""; int term=0; decimal min=0, rate=0; string? src=null;
+  using var r=((dynamic)cmd).ExecuteReader(); if(r.Read()){ bank=r.GetString(0); name=r.GetString(1); cur=r.GetString(2); term=r.GetInt32(3); min=r.GetDecimal(4); rate=r.GetDecimal(5); src=r.IsDBNull(6)?null:r.GetString(6); }
+}
+<h1>@bank — @name</h1>
+<div class="card">
+  <p>Валута: @cur • Срок: @term м. • Мин.: @min.ToString("N0") • Лихва: <b>@rate.ToString("0.##")%</b> @if(!string.IsNullOrWhiteSpace(src)){<text>• <a target="_blank" href="@src">източник</a></text>}</p>
+  <div style="display:flex; gap:8px">
+    <a class="btn" asp-page="Calculate" asp-route-id="@id">Калкулатор</a>
+    <a class="btn secondary" asp-page="History" asp-route-id="@id">История</a>
+  </div>
+</div>
+

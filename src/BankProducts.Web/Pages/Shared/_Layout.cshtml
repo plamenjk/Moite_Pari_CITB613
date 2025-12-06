@@ -1,0 +1,37 @@
+@{
+    var title = ViewData["Title"] as string ?? "BankProducts";
+}
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@title</title>
+  <link rel="stylesheet" href="/site.css" />
+  <script defer src="/site.js"></script>
+</head>
+<body>
+  <div class="nav">
+    <a href="/"><b>BankProducts</b></a>
+    <a href="/Deposits/Index">Депозити</a>
+    <a href="/Deposits/Search">Търсене</a>
+    <a href="/Loans/Index">Кредити</a>
+    <a href="/Loans/Calculator">Кредитен калкулатор</a>
+    <a href="/Admin/Updates">Обновления</a>
+    <a href="/Docs">Документация</a>
+    <div class="spacer"></div>
+    <span class="fxbar" id="fxbar">FX: зареждане...</span>
+    <button id="themeToggle" class="toggle">☼/☾</button>
+  </div>
+  <div class="container">
+    @RenderBody()
+  </div>
+  <script>
+    fetch('/api/fx/latest').then(r=>r.json()).then(x=>{
+      const pairs = Object.entries(x.rates).map(([k,v])=>k+': '+Number(v).toFixed(3)).join(' • ');
+      document.getElementById('fxbar').textContent = 'BGN → ' + pairs;
+    }).catch(()=>{ document.getElementById('fxbar').textContent='FX offline'; });
+  </script>
+</body>
+</html>
+

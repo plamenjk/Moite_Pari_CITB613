@@ -1,0 +1,41 @@
+@page "{id:int}"
+@using System.Globalization
+@inject IDbConnectionFactory DbF
+@{
+  ViewData["Title"]="Разплащателен план";
+  int id = int.Parse((string)RouteData.Values["id"]!);
+  (string bank,string name,string cur,int term,decimal minAmt,decimal rate) Load(int id){
+    using var con=DbF.Create(); ((dynamic)con).Open();
+    using var cmd=con.CreateCommand(); cmd.CommandText="SELECT b.Name,dp.Name,dp.Currency,dp.TermMonths,dp.MinAmount,dp.RateAnnualPercent FROM DepositProduct dp JOIN Bank b ON b.Id=dp.BankId WHERE dp.Id=@id"; var p=cmd.CreateParameter(); p.ParameterName="@id"; p.Value=id; cmd.Parameters.Add(p);
+    using var r=((dynamic)cmd).ExecuteReader(); if(r.Read()) return (r.GetString(0),r.GetString(1),r.GetString(2),r.GetInt32(3),r.GetDecimal(4),r.GetDecimal(5));
+    throw new Exception("Not found");
+  }
+  var info = Load(id);
+  decimal amount;
+  if (Request.Method=="POST" && decimal.TryParse(Request.Form["Amount"], NumberStyles.Any, CultureInfo.InvariantCulture, out var amt)) amount=amt;
+  else amount = Math.Max(info.minAmt, 1000m);
+  bool netAfterTax = Request.Method=="POST" && !string.IsNullOrEmpty(Request.Form["NetAfterTax"]);
+  decimal taxRate = (Request.Method=="POST" && decimal.TryParse(Request.Form["TaxRatePercent"], NumberStyles.Any, CultureInfo.InvariantCulture, out var tr)) ? tr : 10m;
+  decimal gross = Math.Round(amount * (info.rate/100m) * (info.term/12m),2);
+  decimal tax = netAfterTax ? Math.Round(gross*(taxRate/100m),2) : 0m;
+  decimal net = gross - tax;
+  var years = Math.Max(1m/12m, info.term/12m);
+  double eir = Math.Pow((double)((amount + (netAfterTax?net:gross))/amount), 1.0/(double)years)-1.0;
+  decimal eirPct = (decimal)Math.Round(eir*100.0,3);
+}
+<h2>@info.bank — @info.name (@info.cur, @info.term м.)</h2>
+<div class="card">
+  <form method="post" class="grid">
+    <label>Сума (@info.cur)<input type="number" step="0.01" name="Amount" value="@amount" min="@info.minAmt" required /></label>
+    <label><input type="checkbox" name="NetAfterTax" @(netAfterTax? "checked": "") /> Нетен доход (удържа данък)</label>
+    <label>Данък %<input type="number" step="0.01" name="TaxRatePercent" value="@taxRate" /></label>
+    <button class="btn">Изчисли</button>
+  </form>
+</div>
+<div class="card">
+  <p><b>Брутна лихва:</b> @gross.ToString("N2")</p>
+  <p><b>Данък:</b> @tax.ToString("N2")</p>
+  <p><b>Нетна лихва:</b> @net.ToString("N2")</p>
+  <p><b>ЕГЛ:</b> @eirPct.ToString("0.###") %</p>
+</div>
+

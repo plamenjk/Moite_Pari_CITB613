@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "SCMO6eUX/B0=",
+  "success": true,
+  "projectFilePath": "/Users/plamenkostadinov/Downloads/BankProducts_v3_1/src/BankProducts.Core/BankProducts.Core.csproj",
+  "expectedPackageFiles": [
+    "/Users/plamenkostadinov/.nuget/packages/microsoft.netcore.app.ref/8.0.16/microsoft.netcore.app.ref.8.0.16.nupkg.sha512",
+    "/Users/plamenkostadinov/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.16/microsoft.aspnetcore.app.ref.8.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

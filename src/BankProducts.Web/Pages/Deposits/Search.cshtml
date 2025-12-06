@@ -1,0 +1,115 @@
+@page
+@inject IDbConnectionFactory DbF
+
+@{
+  ViewData["Title"]="Разширено търсене — депозити";
+
+  string? bank = Request.Query["bank"];
+  string? cur  = Request.Query["cur"];
+
+  int minTerm = 0, maxTerm = 0;
+  decimal minAmt = 0, maxRate = 0;
+
+  int.TryParse(Request.Query["minTerm"], out minTerm);
+  int.TryParse(Request.Query["maxTerm"], out maxTerm);
+  decimal.TryParse(Request.Query["minAmt"], out minAmt);
+  decimal.TryParse(Request.Query["maxRate"], out maxRate);
+
+  using var con = DbF.Create(); ((dynamic)con).Open();
+  using var cmd = con.CreateCommand();
+
+  var where = new List<string>();
+
+  if (!string.IsNullOrWhiteSpace(bank)) {
+    where.Add("b.Name LIKE @bank");
+    var p = cmd.CreateParameter(); p.ParameterName="@bank"; p.Value="%"+bank+"%"; cmd.Parameters.Add(p);
+  }
+  if (!string.IsNullOrWhiteSpace(cur)) {
+    where.Add("dp.Currency = @cur");
+    var p = cmd.CreateParameter(); p.ParameterName="@cur"; p.Value=cur; cmd.Parameters.Add(p);
+  }
+  if (minTerm > 0) {
+    where.Add("dp.TermMonths >= @minTerm");
+    var p = cmd.CreateParameter(); p.ParameterName="@minTerm"; p.Value=minTerm; cmd.Parameters.Add(p);
+  }
+  if (maxTerm > 0) {
+    where.Add("dp.TermMonths <= @maxTerm");
+    var p = cmd.CreateParameter(); p.ParameterName="@maxTerm"; p.Value=maxTerm; cmd.Parameters.Add(p);
+  }
+  if (minAmt > 0) {
+    where.Add("dp.MinAmount <= @minAmt");
+    var p = cmd.CreateParameter(); p.ParameterName="@minAmt"; p.Value=minAmt; cmd.Parameters.Add(p);
+  }
+  if (maxRate > 0) {
+    where.Add("dp.RateAnnualPercent <= @maxRate");
+    var p = cmd.CreateParameter(); p.ParameterName="@maxRate"; p.Value=maxRate; cmd.Parameters.Add(p);
+  }
+
+  var whereSql = where.Count>0 ? "WHERE " + string.Join(" AND ", where) : "";
+
+  cmd.CommandText = $@"
+SELECT dp.Id, b.Name, dp.Name, dp.Currency, dp.TermMonths, dp.MinAmount, dp.RateAnnualPercent
+FROM DepositProduct dp
+JOIN Bank b ON b.Id = dp.BankId
+{whereSql}
+ORDER BY b.Name, dp.Name";
+
+  var list = new List<(int id,string bank,string name,string cur,int term,decimal minAmt,decimal rate)>();
+  using var r = ((dynamic)cmd).ExecuteReader();
+  while(r.Read()){
+    list.Add((r.GetInt32(0), r.GetString(1), r.GetString(2), r.GetString(3), r.GetInt32(4), r.GetDecimal(5), r.GetDecimal(6)));
+  }
+
+  var minTermVal = minTerm == 0 ? "" : minTerm.ToString();
+  var maxTermVal = maxTerm == 0 ? "" : maxTerm.ToString();
+  var minAmtVal  = minAmt  == 0 ? "" : minAmt.ToString(System.Globalization.CultureInfo.InvariantCulture);
+  var maxRateVal = maxRate == 0 ? "" : maxRate.ToString(System.Globalization.CultureInfo.InvariantCulture);
+}
+
+<h1>Разширено търсене — депозити</h1>
+
+<div class="card">
+  <form method="get" class="grid">
+    <input name="bank" value="@bank" placeholder="Банка" />
+    <select name="cur">
+      <option value="">Валута</option>
+      @foreach (var c in new[]{ "BGN","EUR","USD","GBP","CHF" })
+      {
+          var selAttr = string.Equals(cur, c, System.StringComparison.OrdinalIgnoreCase)
+                        ? " selected=\"selected\"" : "";
+          @:<option value="@c"@Html.Raw(selAttr)>@c</option>
+      }
+    </select>
+    <input name="minTerm" value="@minTermVal" placeholder="Мин срок (м.)" />
+    <input name="maxTerm" value="@maxTermVal" placeholder="Макс срок (м.)" />
+    <input name="minAmt"  value="@minAmtVal"  placeholder="Мин. сума ≤" />
+    <input name="maxRate" value="@maxRateVal" placeholder="Лихва ≤ %" />
+    <button class="btn">Търси</button>
+  </form>
+</div>
+
+@if(list.Count==0){
+  <div class="card">Няма резултати.</div>
+}else{
+  <div class="card">
+    <table class="table">
+      <thead><tr>
+        <th>Банка</th><th>Продукт</th><th>Валута</th><th>Срок</th><th>Мин</th><th>Лихва</th><th></th>
+      </tr></thead>
+      <tbody>
+        @foreach(var x in list){
+          <tr>
+            <td>@x.bank</td>
+            <td>@x.name</td>
+            <td>@x.cur</td>
+            <td>@x.term</td>
+            <td>@x.minAmt.ToString("N0")</td>
+            <td>@x.rate.ToString("0.##")%</td>
+            <td><a class="btn small" href="/Deposits/Details/@x.id">Детайли</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+

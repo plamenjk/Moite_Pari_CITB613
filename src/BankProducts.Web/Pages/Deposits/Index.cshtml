@@ -1,0 +1,41 @@
+@page
+@inject IDbConnectionFactory DbF
+
+@functions{
+  public class DepItem { public int Id; public string Bank=""; public string Name=""; public string Cur="BGN"; public int Term; public decimal MinAmt; public decimal Rate; public string? Src; }
+}
+@{
+  ViewData["Title"]="Каталог депозити";
+  var items = new List<DepItem>();
+  using var con=DbF.Create(); ((dynamic)con).Open();
+  using var cmd=con.CreateCommand(); cmd.CommandText=@"SELECT dp.Id,b.Name,dp.Name,dp.Currency,dp.TermMonths,dp.MinAmount,dp.RateAnnualPercent,dp.SourceUrl 
+FROM DepositProduct dp JOIN Bank b ON b.Id=dp.BankId ORDER BY b.Name, dp.Name";
+  using var r=((dynamic)cmd).ExecuteReader(); 
+  while(r.Read()){
+    items.Add(new DepItem{ Id=r.GetInt32(0), Bank=r.GetString(1), Name=r.GetString(2), Cur=r.GetString(3), Term=r.GetInt32(4), MinAmt=r.GetDecimal(5), Rate=r.GetDecimal(6), Src=r.IsDBNull(7)?null:r.GetString(7)});
+  }
+}
+<h1>Каталог депозити</h1>
+<div class="card"><p class="muted">Маркирай 2+ продукта за сравнение. Детайли/Калкулатор/История на линковете. <small><button class="btn small secondary" onclick="location.href='/Deposits/Search'">Разширено търсене</button></small></p></div>
+@foreach (var d in items){
+  <div class="card selectable">
+    <div class="logo">@d.Bank.Substring(0, System.Math.Min(3, d.Bank.Length)).ToUpper()</div>
+    <div>
+      <div><b>@d.Bank</b> — <a asp-page="Details" asp-route-id="@d.Id">@d.Name</a></div>
+      <div class="muted">Валута: @d.Cur • Срок: @d.Term м. • Мин.: @d.MinAmt.ToString("N0") • Лихва: <b>@d.Rate.ToString("0.##")%</b> @if(!string.IsNullOrWhiteSpace(d.Src)){<text> • <a href="@d.Src" target="_blank">източник</a></text>}</div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <a class="btn" asp-page="Calculate" asp-route-id="@d.Id">Калкулатор</a>
+        <a class="btn secondary" asp-page="History" asp-route-id="@d.Id">История</a>
+        <button class="btn small secondary" data-watch="depos" data-id="@d.Id">☆ Запази</button>
+      </div>
+    </div>
+    <div><input type="checkbox" class="pick" value="@d.Id" onchange="togglePick(this)"/></div>
+  </div>
+}
+<div id="compareBar" class="stickybar"><a class="btn" id="cmpBtn" href="#">Сравни избраните депозити</a></div>
+<script>
+const sel=new Set();
+function togglePick(cb){ if(cb.checked) sel.add(cb.value); else sel.delete(cb.value); document.getElementById('compareBar').classList.toggle('show', sel.size>=2);
+  const ids=[...sel]; document.getElementById('cmpBtn').href='/Deposits/Compare?ids='+ids.join(','); }
+</script>
+
